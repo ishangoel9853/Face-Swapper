@@ -160,8 +160,8 @@ def swapped(image1 , image2):
 	return final_output
 
 # Loading our images
-image1 = cv2.imread('images/Trump.jpg')
-image2 = cv2.imread('images/jongun.jpg')
+image1 = cv2.imread('inp_Img/Trump.jpg')
+image2 = cv2.imread('inp_Img/jongun.jpg')
 
 # face of image2 swapped on image1
 swapped_image = swapped(image1, image2)
