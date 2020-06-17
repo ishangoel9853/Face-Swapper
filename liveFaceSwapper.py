@@ -155,7 +155,7 @@ def swapped(image1 , image2):
 	'''
 	Combines all function and outputs a swapped image
 	'''
-	check = get_landmarks(image1, False)
+	check = get_landmarks(image1, True)
 	
 	if check == 'error':
 		print ('Too Many Faces(No pun intended')
