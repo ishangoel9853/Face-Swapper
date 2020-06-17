@@ -180,7 +180,7 @@ def swapped(image1 , image2):
 
 # Loading our image and camera frame
 capture = cv2.VideoCapture(0)
-image = cv2.imread('images/Trump.jpg')
+image = cv2.imread('inp_Img/Trump.jpg')
 use_dlib = False
 
 while True:
