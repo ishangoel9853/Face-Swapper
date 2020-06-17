@@ -10,7 +10,7 @@ predictor = dlib.shape_predictor(PATH)
 detector = dlib.get_frontal_face_detector() 
 
 # Reading our image
-img = cv2.imread('inp_Img/mr_robot.jpg')
+img = cv2.imread('inp_Img/Hillary.jpg')
 
 # Defining classes for some exception
 class TooManyFaces(Exception):
