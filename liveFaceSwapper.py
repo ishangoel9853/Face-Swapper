@@ -1,6 +1,9 @@
 import cv2
 import numpy as np
 import dlib
+from utilities import get_landmarks
+from utilities import mark_landmarks
+
 
 JAW_POINTS = list(range(0, 17))
 NOSE_POINTS = list(range(27, 35))
@@ -18,8 +21,6 @@ OVERLAY_POINTS = (LEFT_EYE_POINTS+RIGHT_EYE_POINTS+LEFT_BROW_POINTS+RIGHT_BROW_P
 
 # Path to shape predictor file
 DLIB_PATH = 'shape_predictor_68_face_landmarks.dat'
-FACE_CASCADE = 'cascades/haarcascade_frontalface_default.xml'
-face_cascade = cv2.CascadeClassifier(FACE_CASCADE)
 
 # Our landpoints' predictor and detector objects
 predictor = dlib.shape_predictor(DLIB_PATH)
@@ -33,32 +34,21 @@ class NoFaces(Exception):
 	pass
 
 # Detect landpoints' on input image
-def get_landmarks(image, use_dlib):
+def get_landmarks(image):
 	'''
 	Returns a 68x2 element matrix, each row of which corresponding with the 
 	x, y coordinates of a particular feature point in image.
 	'''
-	if use_dlib == True:
-		points = detector(image, 1)
+	points = detector(image, 1)
 
-		if len(points) > 1:
-			raise TooManyFaces
-		if len(points) == 0:
-			raise NoFaces
+	if len(points) > 1:
+		return 'error'
+	if len(points) == 0:
+		return 'error'
 
-		return np.matrix([[t.x, t.y] for t in predictor(image, points[0]).parts()])
+	return np.matrix([[t.x, t.y] for t in predictor(image, points[0]).parts()])
 
-	else:
-		points = face_cascade.detectMultiScale(image, 1.3, 5)
-		if len(points) > 1:
-			return 'error'
-		if len(points) == 0:
-			return 'error'
-		x, y, w, h = points[0]
-		area = dlib.rectangle(int(x), int(y), int(x+w), int(y+h))
-		
-		return np.matrix([[t.x, t.y] for t in predictor(image, area).parts()])		 	
-
+	
 # Mark and point landmarks' on input image using numbers
 def mark_landmarks(image, landmarks):
 	image = image.copy()
@@ -116,10 +106,10 @@ def transform_points(p1, p2):
 
 def read_features(image):
 	img = image
-	img = cv2.resize(img, None, fx=1, fy=1, interpolation=cv2.INTER_LINEAR)
+	img = cv2.resize(img, None, fx=0.75, fy=0.75, interpolation=cv2.INTER_LINEAR)
 	img = cv2.resize(img, (img.shape[1]* 1, img.shape[0]*1))
 
-	landmarks = get_landmarks(img, dlib)
+	landmarks = get_landmarks(img)
 
 	return img, landmarks
 
@@ -155,13 +145,15 @@ def swapped(image1 , image2):
 	'''
 	Combines all function and outputs a swapped image
 	'''
-	check = get_landmarks(image1, False)
-	
-	if check == 'error':
-		print ('Too Many Faces(No pun intended')
+	# image1, landmarks1 = image1, check
+	image1, landmarks1 = read_features(image1)
+	image2, landmarks2 = read_features(image2)
+
+	if landmarks1 == 'error':
+		print ('Face not detected. Please hold still.')
 		return image1
 
-	image1, landmarks1 = image1, check
+	# image1, landmarks1 = image1, check
 	image2, landmarks2 = read_features(image2)	
 
 	M = transform_points(landmarks1[ALIGN_POINTS], landmarks2[ALIGN_POINTS])

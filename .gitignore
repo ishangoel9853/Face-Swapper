@@ -1,2 +1,3 @@
 inp_Img/
 *.jpg
+__pycache__/
