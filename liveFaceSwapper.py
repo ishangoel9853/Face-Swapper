@@ -116,7 +116,7 @@ def transform_points(p1, p2):
 
 def read_features(image):
 	img = image
-	img = cv2.resize(img, None, fx=0.4, fy=0.4, interpolation=cv2.INTER_LINEAR)
+	img = cv2.resize(img, None, fx=1, fy=1, interpolation=cv2.INTER_LINEAR)
 	img = cv2.resize(img, (img.shape[1]* 1, img.shape[0]*1))
 
 	landmarks = get_landmarks(img, dlib)
@@ -155,7 +155,7 @@ def swapped(image1 , image2):
 	'''
 	Combines all function and outputs a swapped image
 	'''
-	check = get_landmarks(image1, True)
+	check = get_landmarks(image1, False)
 	
 	if check == 'error':
 		print ('Too Many Faces(No pun intended')
@@ -185,7 +185,7 @@ use_dlib = False
 
 while True:
 	response, frame = capture.read()
-	frame = cv2.resize(frame, None, fx=0.75, fy=0.75, interpolation=cv2.INTER_LINEAR)
+	frame = cv2.resize(frame, None, fx=1, fy=1, interpolation=cv2.INTER_LINEAR)
 	frame = cv2.flip(frame, 1)
 	cv2.imshow("YOU LOOK LIKE", swapped(frame, image))
 	if cv2.waitKey(1) & 0xFF == ord('q'):

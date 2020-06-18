@@ -102,15 +102,6 @@ def transform_points(p1, p2):
 	return np.vstack([np.hstack(((s2/s1)*R, t2.T - (s2/s1) * R * t1.T)), np.matrix([0., 0., 1.])])
 
 
-def read_features(image):
-	img = image
-	img = cv2.resize(img, None, fx=1, fy=1, interpolation=cv2.INTER_LINEAR)
-	img = cv2.resize(img, (img.shape[1]* 1, img.shape[0]*1))
-
-	landmarks = get_landmarks(img)
-
-	return img, landmarks
-
 def warp_image(image, M, shape):
 	'''
 	Maps the second image onto the first and return ithe same
@@ -143,8 +134,8 @@ def swapped(image1 , image2):
 	'''
 	Combines all function and outputs a swapped image
 	'''
-	image1, landmarks1 = read_features(image1)
-	image2, landmarks2 = read_features(image2)	
+	landmarks1 = get_landmarks(image1)
+	landmarks2 = get_landmarks(image2)	
 
 	M = transform_points(landmarks1[ALIGN_POINTS], landmarks2[ALIGN_POINTS])
 	
