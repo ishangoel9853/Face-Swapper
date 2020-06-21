@@ -2,111 +2,25 @@
 import cv2
 import numpy as np
 import dlib
-from utilities import get_landmarks
-from utilities import mark_landmarks
+import utilities as util
 
-JAW_POINTS = list(range(0, 17))
-NOSE_POINTS = list(range(27, 35))
-FACE_POINTS = list(range(17, 68))
-MOUTH_POINTS = list(range(48, 61))
-RIGHT_BROW_POINTS = list(range(17, 22))
-LEFT_BROW_POINTS = list(range(22, 27))
-RIGHT_EYE_POINTS = list(range(36, 42))
-LEFT_EYE_POINTS = list(range(42, 48))
-
-ALIGN_POINTS = (LEFT_EYE_POINTS+RIGHT_EYE_POINTS+LEFT_BROW_POINTS+RIGHT_BROW_POINTS+MOUTH_POINTS+NOSE_POINTS)
-
-OVERLAY_POINTS = (LEFT_EYE_POINTS+RIGHT_EYE_POINTS+LEFT_BROW_POINTS+RIGHT_BROW_POINTS+NOSE_POINTS+MOUTH_POINTS)
-
-
-def convex_hull(image, points, color):
-	points = cv2.convexHull(points)
-	cv2.fillConvexPoly(image, points, color=color)
-
-
-def face_mask(image, landmarks):
-	'''
-	Generate a mask for the image and a landmark matrix
-	'''
-	image = np.zeros(image.shape[:2], dtype=np.float64)
-
-	for grp in OVERLAY_POINTS:
-		convex_hull(image, landmarks[grp], color=1)
-
-	image = np.array([image, image, image]).transpose((1,2,0))
-	image = (cv2.GaussianBlur(image, (11,11), 0) > 0) * 1.0		
-	image = cv2.GaussianBlur(image, (11,11), 0)
-
-	return image
-
-
-def transform_points(p1, p2):
-	'''
-	Calculates the rotation portion using the Singular Value Decomposition and
-	Return the complete transformaton as an affine transformation matrix.
-	'''
-	p1 = p1.astype(np.float64)
-	p2 = p2.astype(np.float64)
-
-	t1 = np.mean(p1, axis=0)
-	t2 = np.mean(p2, axis=0)
-	p1 -= t1
-	p2 -= t2
-
-	s1 = np.std(p1)
-	s2 = np.std(p2)
-	p1 /= s1
-	p2 /= s2
-
-	U, S, V = np.linalg.svd(p1.T * p2)
-	R = (U * V).T
-
-	return np.vstack([np.hstack(((s2/s1)*R, t2.T - (s2/s1) * R * t1.T)), np.matrix([0., 0., 1.])])
-
-
-def warp_image(image, M, shape):
-	'''
-	Maps the second image onto the first and return ithe same
-	'''
-	initial = np.zeros(shape, dtype=image.dtype)
-	cv2.warpAffine(image, M[:2], (shape[1], shape[0]), dst=initial, borderMode=cv2.BORDER_TRANSPARENT, flags=cv2.WARP_INVERSE_MAP)
-
-	return initial
-
-
-def mix_colors(image1, image2, landmarks, blur_factor=0.6):
-	'''
-	Changes the colouring of image2 to match that of image1
-	'''
-
-	blurred = blur_factor * np.linalg.norm(np.mean(landmarks[LEFT_EYE_POINTS], axis=0) - np.mean(landmarks[RIGHT_EYE_POINTS], axis=0))
-	blurred = int(blurred)
-
-	if blurred % 2 == 0:
-		blurred += 1
-	image1_blur = cv2.GaussianBlur(image1, (blurred, blurred), 0)
-	image2_blur = cv2.GaussianBlur(image2, (blurred, blurred), 0)
-
-	image2_blur += (128 * (image1_blur <= 1.0)).astype(image2_blur.dtype)
-
-	return (image2.astype(np.float64) * image1_blur.astype(np.float64) / image2_blur.astype(np.float64))
 
 
 def swapped(image1 , image2):
 	'''
 	Combines all function and outputs a swapped image
 	'''
-	landmarks1 = get_landmarks(image1)
-	landmarks2 = get_landmarks(image2)	
+	landmarks1 = util.get_landmarks(image1)
+	landmarks2 = util.get_landmarks(image2)	
 
-	M = transform_points(landmarks1[ALIGN_POINTS], landmarks2[ALIGN_POINTS])
+	M = util.transform_points(landmarks1[util.ALIGN_POINTS], landmarks2[util.ALIGN_POINTS])
 	
-	mask = face_mask(image2, landmarks2)
-	warped_mask = warp_image(mask, M, image1.shape)
-	combined_mask = np.max([face_mask(image1, landmarks1), warped_mask], axis=0)
+	mask = util.face_mask(image2, landmarks2)
+	warped_mask = util.warp_image(mask, M, image1.shape)
+	combined_mask = np.max([util.face_mask(image1, landmarks1), warped_mask], axis=0)
 
-	warped_image2 = warp_image(image2, M, image1.shape)
-	warped_image2_new = mix_colors(image1, warped_image2, landmarks1)
+	warped_image2 = util.warp_image(image2, M, image1.shape)
+	warped_image2_new = util.mix_colors(image1, warped_image2, landmarks1)
 
 	final_output = image1 * (1.0 - combined_mask) + warped_image2_new * combined_mask
 	cv2.imwrite("SwappedImage3.jpg", final_output)
