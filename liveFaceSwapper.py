@@ -1,9 +1,12 @@
+# --------------------------Importing libraries-------------------------
+
 import cv2
-import numpy as np
 import dlib
+import numpy as np
 import utilities as util
 
 
+# --------------------------Scaling Function-------------------------
 
 def read_features(image):
 	img = image
@@ -15,6 +18,7 @@ def read_features(image):
 	return img, landmarks
 
 
+# --------------------------Driver Function-------------------------
 
 def swapped(image1 , image2):
 	'''
@@ -24,8 +28,12 @@ def swapped(image1 , image2):
 	image1, landmarks1 = read_features(image1)
 	image2, landmarks2 = read_features(image2)
 
-	if landmarks1 == 'error':
-		print ('Face not detected. Please hold still.')
+	if landmarks1 == 'multiple':
+		print ('ERROR : Multiple faces detected.')
+		return image1
+
+	if landmarks1 == 'none':
+		print ('ERROR : Face not detected.')
 		return image1
 
 	# image1, landmarks1 = image1, check
@@ -45,7 +53,9 @@ def swapped(image1 , image2):
 	o = cv2.imread("SwappedImage.jpg")
 	return o
 
-# Loading our image and camera frame
+
+# --------------------------Image import-------------------------
+
 capture = cv2.VideoCapture(0)
 image = cv2.imread('inp_Img/Trump.jpg')
 use_dlib = False

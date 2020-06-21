@@ -1,10 +1,12 @@
-# import libraries
+# --------------------------Importing libraries-------------------------
+
 import cv2
-import numpy as np
 import dlib
+import numpy as np
 import utilities as util
 
 
+# --------------------------Driver Function-------------------------
 
 def swapped(image1 , image2):
 	'''
@@ -26,7 +28,9 @@ def swapped(image1 , image2):
 	cv2.imwrite("SwappedImage3.jpg", final_output)
 	return final_output
 
-# Loading our images
+
+# --------------------------Image import-------------------------
+
 image1 = cv2.imread('inp_Img/Trump.jpg')
 image2 = cv2.imread('inp_Img/jongun.jpg')
 

@@ -1,8 +1,11 @@
+# --------------------------Importing libraries-------------------------
+
 import cv2
 import dlib
 import numpy as np
 
 
+# --------------------------Defining Facial Points-------------------------
 
 JAW_POINTS = list(range(0, 17))
 NOSE_POINTS = list(range(27, 35))
@@ -17,28 +20,38 @@ ALIGN_POINTS = (LEFT_EYE_POINTS+RIGHT_EYE_POINTS+LEFT_BROW_POINTS+RIGHT_BROW_POI
 
 OVERLAY_POINTS = (LEFT_EYE_POINTS+RIGHT_EYE_POINTS+LEFT_BROW_POINTS+RIGHT_BROW_POINTS+NOSE_POINTS+MOUTH_POINTS)
 
-# Path to shape predictor file
+# Path to shape predictor file for landmark detection
 PATH = 'shape_predictor_68_face_landmarks.dat'
 
-# Our landpoints' predictor and detector objects
+# Dlib predictor and detector objects
 predictor = dlib.shape_predictor(PATH)
 detector = dlib.get_frontal_face_detector()
 
+
+# --------------------------Function Definitions-------------------------
+
 def get_landmarks(image):
 	'''
-	Returns a 68x2 element matrix, each row of which corresponding with the
-	x, y coordinates of a particular feature point in image.
+	FUNCTION : To detect the facial landmarks in an image using the dat file.
+	INPUT : Image for facial Landmark detection.
+	RETURNS : A 68x2 element matrix, each row of which corresponding with the x,y coordinates of a particular feature point in image.
 	'''
 	points = detector(image, 1)
 
 	if len(points) > 1:
-		return 'error'
+		return 'multiple'
 	if len(points) == 0:
-		return 'error'
+		return 'none'
 
 	return np.matrix([[t.x, t.y] for t in predictor(image, points[0]).parts()])
 
+
 def mark_landmarks(image, landmarks):
+	'''
+	FUNCTION : To mark the given landmarks in the given image.
+	INPUT : Image for facial Landmark marking, and a 68x2 element matrix containing facial landmarks to be plotted.
+	RETURNS : Image with the same resolution as the input image and the landmarks(given as input) highlighted.
+	'''
 	image = image.copy()
 	for i, point in enumerate(landmarks):
 		position = (point[0,0], point[0,1])
@@ -49,9 +62,9 @@ def mark_landmarks(image, landmarks):
 
 
 def convex_hull(image, points, color):
+	
 	points = cv2.convexHull(points)
 	cv2.fillConvexPoly(image, points, color=color)
-
 
 
 def face_mask(image, landmarks):
