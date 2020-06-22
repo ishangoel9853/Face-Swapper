@@ -49,7 +49,8 @@ def get_landmarks(image):
 def mark_landmarks(image, landmarks):
 	'''
 	FUNCTION : To mark the given landmarks in the given image.
-	INPUT : Image for facial Landmark marking, and a 68x2 element matrix containing facial landmarks to be plotted.
+	INPUT : 'image' for facial Landmark marking, 
+			'landmarks'- a 68x2 element matrix containing facial landmarks to be plotted.
 	RETURNS : Image with the same resolution as the input image and the landmarks(given as input) highlighted.
 	'''
 	image = image.copy()
@@ -62,14 +63,22 @@ def mark_landmarks(image, landmarks):
 
 
 def convex_hull(image, points, color):
-	
+	'''
+	FUNCTION : Computing the convex hull of the facial landmark points.
+	INPUT : 'image' matrix, 
+			'points'- a 68x2 element matrix containing facial landmarks, 'color' for filling the polygon.
+	RETURNS : -
+	'''
 	points = cv2.convexHull(points)
 	cv2.fillConvexPoly(image, points, color=color)
 
 
 def face_mask(image, landmarks):
 	'''
-	Generate a mask for the image and a landmark matrix
+	FUNCTION : To generate a mask for the image and the facial landmarks.
+	INPUT : 'image' matrix, 
+			'landmarks'- a 68x2 matrix containging facial landmark points for the 'image'.
+	RETURNS : Image with the same resolution as the input image and the landmarks(given as input) highlighted.
 	'''
 	image = np.zeros(image.shape[:2], dtype=np.float64)
 
@@ -83,11 +92,11 @@ def face_mask(image, landmarks):
 	return image
 
 
-
 def transform_points(p1, p2):
 	'''
-	Calculates the rotation portion using the Singular Value Decomposition and
-	Return the complete transformaton as an affine transformation matrix.
+	FUNCTION : CAlculated the degree of rotation between images(using Singlar Value Decomposition).
+	INPUT : 'p1' and 'p2', two 68x2 matrices containing facial landmark points for image1 and image2 respectively.
+	RETURNS : Complete transformation as an affine transformation matrix.
 	'''
 	p1 = p1.astype(np.float64)
 	p2 = p2.astype(np.float64)
@@ -111,10 +120,13 @@ def transform_points(p1, p2):
 
 
 def mix_colors(image1, image2, landmarks, blur_factor=0.6):
+	''''
+	FUNCTION : Change the color of image2 to match the color of image1.
+	INPUT : 'image1' and 'image2'- the input image matrices,
+			'landmarks'- a 68x2 matrix with facial landmark points for image1, 
+			'blur factor'- factor required for Gaussian blurring.
+	RETURNS : image2 with the color similar to the color of image1.
 	'''
-	Changes the colouring of image2 to match that of image1
-	'''
-
 	blurred = blur_factor * np.linalg.norm(np.mean(landmarks[LEFT_EYE_POINTS], axis=0) - np.mean(landmarks[RIGHT_EYE_POINTS], axis=0))
 	blurred = int(blurred)
 
@@ -129,10 +141,13 @@ def mix_colors(image1, image2, landmarks, blur_factor=0.6):
 
 
 
-
 def warp_image(image, M, shape):
 	'''
-	Maps the second image onto the first and return ithe same
+	FUNCTION : Maps image2 to image1.
+	INPUT : 'image' that needs to be warped,
+			'M'- affine transformation matrix
+			'shape'- shape of image to which 'image' has to be warped.
+	RETURNS : Warped image with the shape specified.
 	'''
 	initial = np.zeros(shape, dtype=image.dtype)
 	cv2.warpAffine(image, M[:2], (shape[1], shape[0]), dst=initial, borderMode=cv2.BORDER_TRANSPARENT, flags=cv2.WARP_INVERSE_MAP)

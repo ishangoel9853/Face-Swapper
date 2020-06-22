@@ -22,7 +22,10 @@ def read_features(image):
 
 def swapped(image1 , image2):
 	'''
-	Combines all function and outputs a swapped image
+	FUNCTION : A driver function that combines all the underlying functions.
+	INPUT : 'image1'- the image matrix for the base image,
+			'image2'- the image matrix for the image that has to be superimposed on image1.
+	RETURNS : A final image with the faces swapped.
 	'''
 	# image1, landmarks1 = image1, check
 	image1, landmarks1 = read_features(image1)
