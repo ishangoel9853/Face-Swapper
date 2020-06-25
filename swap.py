@@ -42,8 +42,8 @@ def base_func(image1 , image2):
 
 # --------------------------Image import-------------------------
 
-img1 = cv2.imread('inp_Img/Trump.jpg')
-img2 = cv2.imread('inp_Img/jongun.jpg')
+img1 = cv2.imread('inp_Img/pp.jpg')
+img2 = cv2.imread('inp_Img/gadot.jpg')
 # print(img1.shape)
 
 # face of image2 swapped on image1

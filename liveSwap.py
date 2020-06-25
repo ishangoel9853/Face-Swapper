@@ -57,7 +57,7 @@ def base_func(image1 , image2):
 # --------------------------Image import-------------------------
 
 camera = cv2.VideoCapture(0)
-img = cv2.imread('inp_Img/Trump.jpg')
+img = cv2.imread('inp_Img/ranbir.jpg')
 
 while True:
 	response, frame = camera.read()
