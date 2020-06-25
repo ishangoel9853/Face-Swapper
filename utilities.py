@@ -80,7 +80,7 @@ def getMask(image, landmarks):
 	FUNCTION : To generate a mask for the image and the facial landmarks.
 	INPUT : 'image' matrix, 
 			'landmarks'- a 68x2 matrix containging facial landmark points for the 'image'.
-	RETURNS : Image with the same resolution as the input image and the landmarks(given as input) highlighted.
+	RETURNS : Mask of Image with the same resolution as the input image.
 	'''
 	image = np.zeros(image.shape[:2], dtype=np.float64)
 
